@@ -1,0 +1,12 @@
+Assertion:
+  for i in <resultset>
+    bs.append(i)
+
+  does not work, as the append deletes from the resultset
+
+Task:
+  Confirm
+
+  Determine cause
+
+  File bug against BS
