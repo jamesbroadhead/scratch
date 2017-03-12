@@ -1,32 +1,47 @@
 #!/usr/bin/env python
-
+"""
+Given html with tables, remove all table tags, preserving the content which
+existed inside them
+"""
 import sys
 
 from bs4 import BeautifulSoup
 
 def remove(soup, tagname):
-    for tag in soup.findAll(tagname):
+    tags = soup.findAll(tagname)
+
+    for tag in tags:
         contents = tag.contents
         parent = tag.parent
+
+        # Destructively rips this element out of the tree
+        #print 'pre-extract: {}'.format(id(tag.parent))
         tag.extract()
-        for tag in contents:
-            parent.append(tag)
-    return soup.prettify()
+        #print 'post-extract: {}'.format(tag.parent)
+
+        # the tag doesn't unset its parent?
+
+        # ==> this is calling append on the 'old' parent
+        for content in contents:
+            print id(parent)
+            print id(content.parent)
+            print id(tag)
+            #print contents
+            #print len(contents)
+            parent.append(content)
 
 def main(filename):
     with open(filename) as fh:
         content = fh.read()
 
     html = content
-    soup = None
-    for tag in [ 'td', 'tr', 'thead', 'tbody', 'ttail', 'table' ]:
-        soup = BeautifulSoup(html, "lxml")
-        html = remove(soup, tag)
+    soup = BeautifulSoup(html, "lxml")
+    remove(soup, 'td')
 
-
-    with open(filename, 'w') as fh:
-        fh.write(soup.prettify())
+    #print soup.prettify()
 
 if __name__ == '__main__':
+    if len(sys.argv) == 1:
+        raise Exception('Must supply an argument')
     for arg in sys.argv[1:]:
         main(arg)
